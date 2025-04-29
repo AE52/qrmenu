@@ -20,9 +20,10 @@ import {
   Avatar,
   InputAdornment,
   IconButton,
-  alpha
+  alpha,
+  Chip,
+  Grid
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { supabase } from '../lib/supabase';
 import { uploadImage } from '../lib/storage-helpers';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -124,7 +125,6 @@ export default function AdvertiserApplicationForm() {
           phone: formData.phone,
           email: formData.email,
           tc_no: formData.tc_no,
-          password: formData.password,
           user_id: authData.user?.id || null,
           status: 'pending'
         });
@@ -468,16 +468,87 @@ export default function AdvertiserApplicationForm() {
                   Şirket Bilgileri
                 </Typography>
                 
+                <Divider sx={{ mb: 4 }}>
+                  <Chip icon={<CampaignIcon />} label="Firma Bilgileri" color="primary" />
+                </Divider>
+                
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Box 
+                      sx={{ 
+                        width: '100%', 
+                        maxWidth: 220,
+                        textAlign: 'center'
+                      }}
+                    >
+                      <input
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        id="logo-upload"
+                        type="file"
+                        onChange={handleLogoChange}
+                      />
+                      <label htmlFor="logo-upload">
+                        <Box 
+                          sx={{ 
+                            position: 'relative',
+                            width: 'fit-content',
+                            mx: 'auto'
+                          }}
+                        >
+                          <Avatar 
+                            variant="rounded"
+                            src={logoPreview || '/placeholder-logo.png'}
+                            sx={{ 
+                              width: 150, 
+                              height: 150, 
+                              mx: 'auto',
+                              borderRadius: 2,
+                              mb: 1,
+                              bgcolor: theme.palette.mode === 'dark' ? alpha('#fff', 0.1) : alpha('#000', 0.05),
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                transform: 'scale(1.05)',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.12)'
+                              }
+                            }}
+                          />
+                          <Box 
+                            sx={{ 
+                              position: 'absolute',
+                              bottom: 10,
+                              right: -10,
+                              zIndex: 2,
+                              bgcolor: 'primary.main',
+                              borderRadius: '50%',
+                              width: 36,
+                              height: 36,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: 1
+                            }}
+                          >
+                            <UploadFileIcon sx={{ color: 'white', fontSize: 22 }} />
+                          </Box>
+                        </Box>
+                      </label>
+                      <FormHelperText sx={{ textAlign: 'center' }}>
+                        Şirket logonuzu yükleyin
+                      </FormHelperText>
+                    </Box>
+                  </Grid>
+
+                  <Grid xs={12} md={6}>
                     <TextField
-                      fullWidth
                       required
-                      label="Şirket Adı"
                       name="company_name"
+                      label="Şirket Adı"
                       value={formData.company_name}
                       onChange={handleChange}
-                      variant="outlined"
+                      fullWidth
+                      sx={inputSx}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -485,109 +556,19 @@ export default function AdvertiserApplicationForm() {
                           </InputAdornment>
                         ),
                       }}
-                      sx={inputSx}
                     />
                   </Grid>
-                  
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+
+                  <Grid xs={12} md={6}>
                     <TextField
-                      fullWidth
-                      multiline
-                      rows={3}
-                      label="Açıklama"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      placeholder="Şirketiniz hakkında kısa bir açıklama yazın"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5, mr: 1 }}>
-                            <DescriptionIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={multilineInputSx}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <TextField
-                      fullWidth
                       required
-                      label="Adres"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <HomeIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={inputSx}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Telefon"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="05XX XXX XX XX"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <PhoneIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={inputSx}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="TC Kimlik No"
-                      name="tc_no"
-                      value={formData.tc_no}
-                      onChange={handleChange}
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <BadgeIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={inputSx}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12} sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mt: 1, mb: 3 }}>
-                      Hesap Bilgileri
-                    </Typography>
-                  </Grid>
-                  
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="email"
-                      label="E-posta"
                       name="email"
+                      label="E-posta"
+                      type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      variant="outlined"
+                      fullWidth
+                      sx={inputSx}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -595,20 +576,96 @@ export default function AdvertiserApplicationForm() {
                           </InputAdornment>
                         ),
                       }}
-                      sx={inputSx}
                     />
                   </Grid>
-                  
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+
+                  <Grid xs={12}>
                     <TextField
+                      name="description"
+                      label="Açıklama"
+                      value={formData.description}
+                      onChange={handleChange}
                       fullWidth
+                      multiline
+                      rows={4}
+                      sx={multilineInputSx}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <DescriptionIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid xs={12} md={6}>
+                    <TextField
                       required
-                      label="Şifre"
+                      name="address"
+                      label="Adres"
+                      value={formData.address}
+                      onChange={handleChange}
+                      fullWidth
+                      sx={inputSx}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <HomeIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid xs={12} md={6}>
+                    <TextField
+                      required
+                      name="phone"
+                      label="Telefon"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      fullWidth
+                      sx={inputSx}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PhoneIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid xs={12} md={6}>
+                    <TextField
+                      required
+                      name="tc_no"
+                      label="TC Kimlik No"
+                      value={formData.tc_no}
+                      onChange={handleChange}
+                      fullWidth
+                      sx={inputSx}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <BadgeIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid xs={12} md={6}>
+                    <TextField
+                      required
                       name="password"
+                      label="Şifre"
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={handleChange}
-                      variant="outlined"
+                      fullWidth
+                      sx={inputSx}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -617,77 +674,43 @@ export default function AdvertiserApplicationForm() {
                         ),
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton onClick={toggleShowPassword} edge="end" size="small">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={toggleShowPassword}
+                              edge="end"
+                            >
                               {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                             </IconButton>
                           </InputAdornment>
                         ),
                       }}
-                      sx={inputSx}
                     />
                   </Grid>
-                  
-                  <Grid item xs={12} sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mt: 1, mb: 3 }}>
-                      Şirket Logosu
-                    </Typography>
-                  </Grid>
-                  
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+
+                  <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                     <Button
-                      component="label"
-                      variant="outlined"
+                      type="submit"
+                      variant="contained"
+                      size="large"
                       color="primary"
-                      startIcon={<UploadFileIcon />}
-                      sx={{ 
+                      startIcon={<SaveIcon />}
+                      disabled={loading}
+                      sx={{
                         borderRadius: 2,
-                        p: 1.5,
-                        width: '100%',
+                        py: 1.5,
+                        px: 4,
+                        boxShadow: 2,
+                        width: { xs: '100%', sm: 'auto' },
                         maxWidth: '500px',
-                        height: '56px',
-                        borderColor: alpha(theme.palette.primary.main, 0.5),
+                        transition: 'all 0.2s',
                         '&:hover': {
-                          borderColor: theme.palette.primary.main,
-                          backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                          transform: 'translateY(-2px)',
+                          boxShadow: 4,
                         }
                       }}
                     >
-                      Logo Yükle (İsteğe Bağlı)
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={handleLogoChange}
-                      />
+                      {loading ? <CircularProgress size={24} /> : 'Başvuruyu Gönder'}
                     </Button>
-                  </Grid>
-                  
-                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Box sx={{ width: '100%', textAlign: 'center' }}>
-                      <Divider sx={{ mb: 3 }} />
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        disabled={loading}
-                        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                        sx={{ 
-                          borderRadius: 2,
-                          py: 1.5,
-                          px: 4,
-                          height: '56px',
-                          boxShadow: '0 4px 10px rgba(25, 118, 210, 0.25)',
-                          '&:hover': {
-                            boxShadow: '0 6px 15px rgba(25, 118, 210, 0.35)',
-                          },
-                          width: '100%',
-                          maxWidth: '500px'
-                        }}
-                      >
-                        {loading ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}
-                      </Button>
-                    </Box>
                   </Grid>
                 </Grid>
               </Box>
