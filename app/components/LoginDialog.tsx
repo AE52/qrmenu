@@ -84,7 +84,7 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
       }}
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
-        <Typography variant="h6">Giriş Yap</Typography>
+        <Typography variant="h6" component="div">Giriş Yap</Typography>
         <IconButton onClick={handleClose} edge="end" aria-label="close">
           <CloseIcon />
         </IconButton>

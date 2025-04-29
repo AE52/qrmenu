@@ -11,17 +11,41 @@ import {
   Stack, 
   Container,
   CircularProgress,
-  FormHelperText
+  FormHelperText,
+  useMediaQuery,
+  useTheme,
+  Divider,
+  Card,
+  CardMedia,
+  Avatar,
+  InputAdornment,
+  IconButton,
+  alpha
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { supabase } from '../lib/supabase';
 import { uploadImage } from '../lib/storage-helpers';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SaveIcon from '@mui/icons-material/Save';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+import HomeIcon from '@mui/icons-material/Home';
+import BadgeIcon from '@mui/icons-material/Badge';
+import PasswordIcon from '@mui/icons-material/Password';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PersonIcon from '@mui/icons-material/Person';
+import TableBarIcon from '@mui/icons-material/TableBar';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useRouter } from 'next/navigation';
 
 export default function RestaurantApplicationForm() {
   const router = useRouter();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -38,6 +62,7 @@ export default function RestaurantApplicationForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setErrorMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -92,7 +117,7 @@ export default function RestaurantApplicationForm() {
 
       // Başvuruyu oluştur
       const { error } = await supabase
-        .from('restaurant_applications')
+        .from('restaurants')
         .insert({
           name: formData.name,
           description: formData.description || null,
@@ -139,176 +164,559 @@ export default function RestaurantApplicationForm() {
     }
   };
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  // Input alanlarının ortak özellikleri
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      transition: 'all 0.2s',
+      height: '56px',
+      '&:hover': {
+        boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+      },
+      '&.Mui-focused': {
+        boxShadow: '0 0 0 3px rgba(25, 118, 210, 0.2)',
+      }
+    },
+    width: '100%',
+    maxWidth: '500px',
+    mx: 'auto'
+  };
+
+  // Multiline alanların özellikleri
+  const multilineInputSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      transition: 'all 0.2s',
+      '&:hover': {
+        boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+      },
+      '&.Mui-focused': {
+        boxShadow: '0 0 0 3px rgba(25, 118, 210, 0.2)',
+      }
+    },
+    width: '100%',
+    maxWidth: '500px',
+    mx: 'auto'
+  };
+
   return (
-    <Container maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Restoran Başvurusu
-        </Typography>
-        
-        <Typography variant="body1" color="text.secondary" paragraph>
-          QR Menü sistemimizde restoranınızı tanıtmak için aşağıdaki formu doldurun. 
-          Başvurunuz incelendikten sonra size e-posta ile bilgi verilecektir.
-        </Typography>
-        
-        {success && (
-          <Alert severity="success" sx={{ mb: 3 }}>
-            Başvurunuz başarıyla alındı! İncelendikten sonra size bilgi verilecektir. Ana sayfaya yönlendiriliyorsunuz...
-          </Alert>
-        )}
-        
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-        
-        <Box component="form" onSubmit={handleSubmit} noValidate>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Restoran Adı"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                disabled={loading}
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          borderRadius: 4,
+          overflow: 'hidden',
+          bgcolor: '#ffffff',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.08)'
+        }}
+      >
+        {/* Header Bölümü */}
+        <Box 
+          sx={{ 
+            bgcolor: 'primary.main', 
+            py: 3, 
+            px: { xs: 3, md: 5 },
+            position: 'relative',
+            overflow: 'hidden',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: '40%',
+              height: '100%',
+              background: `linear-gradient(135deg, transparent 0%, ${alpha(theme.palette.primary.light, 0.4)} 100%)`,
+              zIndex: 1
+            }
+          }}
+        >
+          <Box sx={{ position: 'relative', zIndex: 2 }}>
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <RestaurantIcon 
+                sx={{ 
+                  fontSize: { xs: 36, md: 42 }, 
+                  color: 'white',
+                  mr: 2,
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                }} 
               />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Açıklama"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                multiline
-                rows={3}
-                disabled={loading}
-              />
-              <FormHelperText>Opsiyonel</FormHelperText>
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <TextField
-                required
-                fullWidth
-                label="Adres"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <TextField
-                required
-                fullWidth
-                label="Telefon"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <TextField
-                required
-                fullWidth
-                label="E-posta"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <TextField
-                required
-                fullWidth
-                label="İşletme Sahibinin Adı"
-                name="owner_name"
-                value={formData.owner_name}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <TextField
-                required
-                fullWidth
-                label="TC Kimlik No"
-                name="tc_no"
-                value={formData.tc_no}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </Grid>
-            
-            <Grid item xs={12} md={6}>
-              <TextField
-                required
-                fullWidth
-                label="Şifre"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <Stack direction="column" spacing={2}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                  startIcon={<UploadFileIcon />}
-                  disabled={loading}
-                >
-                  Logo Yükle
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                  />
-                </Button>
-                <FormHelperText>Opsiyonel</FormHelperText>
+              <Typography 
+                variant="h4" 
+                component="h1" 
+                fontWeight="800" 
+                color="white"
+                sx={{ 
+                  fontSize: { xs: '1.5rem', md: '2rem' },
+                  textShadow: '0px 2px 4px rgba(0,0,0,0.2)'
+                }}
+              >
+                Restoran Başvurusu
+              </Typography>
+            </Box>
+            <Typography 
+              variant="body1"
+              color="white"
+              align="center"
+              sx={{ 
+                mt: 1, 
+                mb: 0, 
+                maxWidth: '600px',
+                opacity: 0.9,
+                mx: 'auto'
+              }}
+            >
+              QR Menü sistemimize restoran olarak katılmak için başvuru formunu eksiksiz doldurun.
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+          {/* Sol Bilgi Paneli */}
+          <Box
+            sx={{
+              width: { xs: '100%', md: '33.33%' },
+              bgcolor: alpha(theme.palette.primary.light, 0.05),
+              p: { xs: 3, md: 4 },
+              borderRight: { md: `1px solid ${alpha(theme.palette.divider, 0.08)}` },
+              display: { xs: 'none', md: 'block' }
+            }}
+          >
+            <Box sx={{ position: 'sticky', top: 20 }}>
+              <Typography variant="h6" fontWeight="600" color="primary.dark" gutterBottom align="center">
+                QR Menü Avantajları
+              </Typography>
+              
+              <Stack spacing={2} sx={{ mt: 3 }}>
+                <Card elevation={0} sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04), p: 2, borderRadius: 3 }}>
+                  <Box display="flex">
+                    <Box 
+                      sx={{ 
+                        width: 40, 
+                        height: 40, 
+                        borderRadius: '50%', 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2
+                      }}
+                    >
+                      <Typography variant="h6" color="primary.main">1</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight="600" color="text.primary">
+                        Temassız Dijital Menü
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Kağıt menüye gerek kalmadan müşterilerinize kolay erişim
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Card>
                 
-                {logoPreview && (
-                  <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Card elevation={0} sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04), p: 2, borderRadius: 3 }}>
+                  <Box display="flex">
+                    <Box 
+                      sx={{ 
+                        width: 40, 
+                        height: 40, 
+                        borderRadius: '50%', 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2
+                      }}
+                    >
+                      <Typography variant="h6" color="primary.main">2</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight="600" color="text.primary">
+                        Hızlı Güncellemeler
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Fiyat ve menü içeriğini anında güncelleyebilirsiniz
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Card>
+                
+                <Card elevation={0} sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04), p: 2, borderRadius: 3 }}>
+                  <Box display="flex">
+                    <Box 
+                      sx={{ 
+                        width: 40, 
+                        height: 40, 
+                        borderRadius: '50%', 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2
+                      }}
+                    >
+                      <Typography variant="h6" color="primary.main">3</Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight="600" color="text.primary">
+                        Modern Görünüm
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Restoranınıza çağdaş bir imaj kazandırın
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Card>
+              </Stack>
+              
+              {logoPreview && (
+                <Box sx={{ mt: 4, textAlign: 'center' }}>
+                  <Box
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      mx: 'auto',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                      border: '4px solid white',
+                      position: 'relative',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(255,255,255,0.1)',
+                        zIndex: 1
+                      }
+                    }}
+                  >
                     <img 
                       src={logoPreview} 
-                      alt="Logo önizleme" 
-                      style={{ maxWidth: '200px', maxHeight: '200px' }} 
+                      alt="Logo önizleme"
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover',
+                        objectPosition: 'center'
+                      }} 
                     />
                   </Box>
-                )}
-              </Stack>
-            </Grid>
-            
-            <Grid item xs={12}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                startIcon={loading ? <CircularProgress size={24} /> : <SaveIcon />}
-                disabled={loading}
-              >
-                {loading ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}
-              </Button>
-            </Grid>
-          </Grid>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                    Restoran logo önizleme
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
+          
+          {/* Form Alanı */}
+          <Box
+            sx={{
+              width: { xs: '100%', md: '66.67%' }
+            }}
+          >
+            <Box 
+              component="form" 
+              onSubmit={handleSubmit}
+              sx={{ 
+                p: { xs: 3, md: 5 },
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}
+            >
+              {success && (
+                <Alert 
+                  severity="success" 
+                  variant="filled"
+                  sx={{ 
+                    mb: 4, 
+                    borderRadius: 2,
+                    boxShadow: '0 4px 12px rgba(0,150,0,0.15)',
+                    py: 2,
+                    width: '100%',
+                    maxWidth: 500
+                  }}
+                >
+                  Başvurunuz başarıyla alındı! İncelendikten sonra size bilgi verilecektir. Ana sayfaya yönlendiriliyorsunuz...
+                </Alert>
+              )}
+              
+              {error && (
+                <Alert 
+                  severity="error" 
+                  variant="filled"
+                  sx={{ 
+                    mb: 4, 
+                    borderRadius: 2,
+                    boxShadow: '0 4px 12px rgba(150,0,0,0.15)',
+                    py: 2,
+                    width: '100%',
+                    maxWidth: 500
+                  }}
+                >
+                  {error}
+                </Alert>
+              )}
+              
+              <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto' }}>
+                <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mb: 3, textAlign: 'center' }}>
+                  Restoran Bilgileri
+                </Typography>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      label="Restoran Adı"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <RestaurantIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={3}
+                      label="Açıklama"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder="Restoranınız hakkında kısa bir açıklama yazın"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5, mr: 1 }}>
+                            <DescriptionIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={multilineInputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      label="Adres"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <HomeIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      label="Telefon"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="05XX XXX XX XX"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PhoneIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      label="TC Kimlik No"
+                      name="tc_no"
+                      value={formData.tc_no}
+                      onChange={handleChange}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <BadgeIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mt: 1, mb: 3 }}>
+                      Hesap Bilgileri
+                    </Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      label="İşletme Sahibi Adı"
+                      name="owner_name"
+                      value={formData.owner_name}
+                      onChange={handleChange}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      type="email"
+                      label="E-posta"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EmailIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <TextField
+                      fullWidth
+                      required
+                      label="Şifre"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={handleChange}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PasswordIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={toggleShowPassword} edge="end" size="small">
+                              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={inputSx}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                    <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mt: 1, mb: 3 }}>
+                      Restoran Logosu
+                    </Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<UploadFileIcon />}
+                      sx={{ 
+                        borderRadius: 2,
+                        p: 1.5,
+                        width: '100%',
+                        maxWidth: '500px',
+                        height: '56px',
+                        borderColor: alpha(theme.palette.primary.main, 0.5),
+                        '&:hover': {
+                          borderColor: theme.palette.primary.main,
+                          backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                        }
+                      }}
+                    >
+                      Logo Yükle (İsteğe Bağlı)
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                      />
+                    </Button>
+                  </Grid>
+                  
+                  <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{ width: '100%', textAlign: 'center' }}>
+                      <Divider sx={{ mb: 3 }} />
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        disabled={loading}
+                        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                        sx={{ 
+                          borderRadius: 2,
+                          py: 1.5,
+                          px: 4,
+                          height: '56px',
+                          boxShadow: '0 4px 10px rgba(25, 118, 210, 0.25)',
+                          '&:hover': {
+                            boxShadow: '0 6px 15px rgba(25, 118, 210, 0.35)',
+                          },
+                          width: '100%',
+                          maxWidth: '500px'
+                        }}
+                      >
+                        {loading ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}
+                      </Button>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Box>
+          </Box>
         </Box>
       </Paper>
     </Container>

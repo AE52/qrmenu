@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, ListItemIcon, Container } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, ListItemIcon, Container, useMediaQuery, useTheme, Drawer, List, ListItem, ListItemText } from '@mui/material';
 import { supabase } from '../lib/supabase';
 import LoginDialog from './LoginDialog';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -12,6 +12,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import CloseIcon from '@mui/icons-material/Close';
 import { usePathname, useRouter } from 'next/navigation';
 
 interface NavbarLayoutProps {
@@ -28,6 +29,10 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
   const router = useRouter();
   const isMenuOpen = Boolean(menuAnchorEl);
   const [profileName, setProfileName] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Menüde navbar'ı gizlemek için
   const shouldHideNavbar = hideNavbarOnPath && pathname?.startsWith(hideNavbarOnPath);
@@ -103,6 +108,7 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
 
   const handleLoginClick = () => {
     setLoginDialogOpen(true);
+    setMobileMenuOpen(false);
   };
 
   const handleLoginDialogClose = () => {
@@ -119,6 +125,7 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
 
   const handleLogout = async () => {
     handleMenuClose();
+    setMobileMenuOpen(false);
     await supabase.auth.signOut();
     setUser(null);
     if (pathname?.startsWith('/dashboard')) {
@@ -128,39 +135,47 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
 
   const handleDashboardClick = () => {
     handleMenuClose();
+    setMobileMenuOpen(false);
     router.push('/dashboard');
   };
 
   const handleAdminClick = () => {
     handleMenuClose();
+    setMobileMenuOpen(false);
     router.push('/dashboard/admin');
   };
 
   const handleProfileClick = () => {
     handleMenuClose();
+    setMobileMenuOpen(false);
     router.push('/dashboard/profile');
   };
 
   const handleApplicationClick = () => {
     handleMenuClose();
+    setMobileMenuOpen(false);
     router.push('/restaurant-application');
   };
 
   const handleAdvertiserApplicationClick = () => {
     handleMenuClose();
+    setMobileMenuOpen(false);
     router.push('/advertiser-application');
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   return (
     <>
       {!shouldHideNavbar && (
         <AppBar position="sticky">
-          <Toolbar>
+          <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Typography 
               variant="h6" 
               component="div" 
               sx={{ 
-                flexGrow: 1, 
                 cursor: 'pointer',
                 fontWeight: 'bold',
                 display: 'flex',
@@ -175,7 +190,8 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
             
             {user ? (
               <>
-                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+                {/* Desktop Menü */}
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
                   <Button 
                     color="inherit" 
                     startIcon={<DashboardIcon />}
@@ -193,28 +209,40 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
                       Admin Panel
                     </Button>
                   )}
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+                    <Typography variant="body2" sx={{ mr: 1 }}>
+                      {profileName || user.email}
+                    </Typography>
+                    <IconButton
+                      onClick={handleMenuClick}
+                      size="small"
+                      aria-controls={isMenuOpen ? 'account-menu' : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={isMenuOpen ? 'true' : undefined}
+                      color="inherit"
+                    >
+                      <Avatar 
+                        sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}
+                      >
+                        {(profileName ? profileName.charAt(0) : user.email?.charAt(0) || 'U').toUpperCase()}
+                      </Avatar>
+                    </IconButton>
+                  </Box>
                 </Box>
                 
-                <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
-                  <Typography variant="body2" sx={{ mr: 1, display: { xs: 'none', sm: 'block' } }}>
-                    {profileName || user.email}
-                  </Typography>
-                  <IconButton
-                    onClick={handleMenuClick}
-                    size="small"
-                    aria-controls={isMenuOpen ? 'account-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={isMenuOpen ? 'true' : undefined}
-                    color="inherit"
+                {/* Mobil Hamburger Menü */}
+                <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                  <IconButton 
+                    color="inherit" 
+                    onClick={toggleMobileMenu}
+                    edge="end"
                   >
-                    <Avatar 
-                      sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}
-                    >
-                      {(profileName ? profileName.charAt(0) : user.email?.charAt(0) || 'U').toUpperCase()}
-                    </Avatar>
+                    <MenuIcon />
                   </IconButton>
                 </Box>
                 
+                {/* User Menu */}
                 <Menu
                   anchorEl={menuAnchorEl}
                   id="account-menu"
@@ -258,34 +286,142 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
               </>
             ) : (
               <>
-                <Button 
-                  color="inherit"
-                  startIcon={<AddCircleOutlineIcon />}
-                  onClick={handleApplicationClick}
-                  sx={{ mr: 1 }}
-                >
-                  Restoran Başvurusu
-                </Button>
-                <Button 
-                  color="inherit"
-                  startIcon={<CampaignIcon />}
-                  onClick={handleAdvertiserApplicationClick}
-                  sx={{ mr: 1 }}
-                >
-                  Reklam Veren Başvurusu
-                </Button>
-                <Button 
-                  color="inherit" 
-                  variant="outlined"
-                  onClick={handleLoginClick}
-                >
-                  Giriş Yap
-                </Button>
+                {/* Desktop Menü */}
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+                  <Button 
+                    color="inherit"
+                    startIcon={<AddCircleOutlineIcon />}
+                    onClick={handleApplicationClick}
+                  >
+                    Restoran Başvurusu
+                  </Button>
+                  <Button 
+                    color="inherit"
+                    startIcon={<CampaignIcon />}
+                    onClick={handleAdvertiserApplicationClick}
+                  >
+                    Reklam Veren Başvurusu
+                  </Button>
+                  <Button 
+                    color="inherit" 
+                    variant="outlined"
+                    onClick={handleLoginClick}
+                  >
+                    Giriş Yap
+                  </Button>
+                </Box>
+                
+                {/* Mobil Hamburger Menü */}
+                <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                  <Button 
+                    color="inherit" 
+                    variant="outlined"
+                    onClick={handleLoginClick}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  >
+                    Giriş Yap
+                  </Button>
+                  <IconButton 
+                    color="inherit" 
+                    onClick={toggleMobileMenu}
+                    edge="end"
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                </Box>
               </>
             )}
           </Toolbar>
         </AppBar>
       )}
+      
+      {/* Mobil Menü Drawer */}
+      <Drawer
+        anchor="right"
+        open={mobileMenuOpen}
+        onClose={toggleMobileMenu}
+        sx={{
+          '& .MuiDrawer-paper': { 
+            width: '70%', 
+            maxWidth: 300,
+            boxSizing: 'border-box' 
+          },
+        }}
+      >
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <RestaurantIcon />
+            QR MENÜ
+          </Typography>
+          <IconButton onClick={toggleMobileMenu}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        
+        <List>
+          {user ? (
+            <>
+              <ListItem button onClick={handleProfileClick}>
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary="Profilim" />
+              </ListItem>
+              
+              <ListItem button onClick={handleDashboardClick}>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
+              
+              {isAdmin && (
+                <ListItem button onClick={handleAdminClick}>
+                  <ListItemIcon>
+                    <AdminPanelSettingsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Admin Panel" />
+                </ListItem>
+              )}
+              
+              <Divider />
+              
+              <ListItem button onClick={handleLogout}>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary="Çıkış Yap" />
+              </ListItem>
+            </>
+          ) : (
+            <>
+              <ListItem button onClick={handleApplicationClick}>
+                <ListItemIcon>
+                  <AddCircleOutlineIcon />
+                </ListItemIcon>
+                <ListItemText primary="Restoran Başvurusu" />
+              </ListItem>
+              
+              <ListItem button onClick={handleAdvertiserApplicationClick}>
+                <ListItemIcon>
+                  <CampaignIcon />
+                </ListItemIcon>
+                <ListItemText primary="Reklam Veren Başvurusu" />
+              </ListItem>
+              
+              <Divider />
+              
+              <ListItem button onClick={handleLoginClick}>
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary="Giriş Yap" />
+              </ListItem>
+            </>
+          )}
+        </List>
+      </Drawer>
       
       <LoginDialog 
         open={loginDialogOpen} 
