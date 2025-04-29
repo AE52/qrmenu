@@ -473,7 +473,7 @@ export default function AdvertiserApplicationForm() {
                 </Divider>
                 
                 <Grid container spacing={3}>
-                  <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Box 
                       sx={{ 
                         width: '100%', 
@@ -540,7 +540,7 @@ export default function AdvertiserApplicationForm() {
                     </Box>
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
                       required
                       name="company_name"
@@ -559,7 +559,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
                       required
                       name="email"
@@ -579,7 +579,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12}>
+                  <Grid size={12}>
                     <TextField
                       name="description"
                       label="Açıklama"
@@ -599,7 +599,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
                       required
                       name="address"
@@ -618,7 +618,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
                       required
                       name="phone"
@@ -637,7 +637,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
                       required
                       name="tc_no"
@@ -656,7 +656,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <TextField
                       required
                       name="password"
@@ -687,7 +687,7 @@ export default function AdvertiserApplicationForm() {
                     />
                   </Grid>
 
-                  <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Grid size={12} sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                     <Button
                       type="submit"
                       variant="contained"

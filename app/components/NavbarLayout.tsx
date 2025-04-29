@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, ListItemIcon, Container, useMediaQuery, useTheme, Drawer, List, ListItem, ListItemText } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, ListItemIcon, Container, useMediaQuery, useTheme, Drawer, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { supabase } from '../lib/supabase';
 import LoginDialog from './LoginDialog';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -362,62 +362,62 @@ export default function NavbarLayout({ children, hideNavbarOnPath }: NavbarLayou
         <List>
           {user ? (
             <>
-              <ListItem button onClick={handleProfileClick}>
+              <ListItemButton onClick={handleProfileClick}>
                 <ListItemIcon>
                   <PersonIcon />
                 </ListItemIcon>
                 <ListItemText primary="Profilim" />
-              </ListItem>
+              </ListItemButton>
               
-              <ListItem button onClick={handleDashboardClick}>
+              <ListItemButton onClick={handleDashboardClick}>
                 <ListItemIcon>
                   <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
-              </ListItem>
+              </ListItemButton>
               
               {isAdmin && (
-                <ListItem button onClick={handleAdminClick}>
+                <ListItemButton onClick={handleAdminClick}>
                   <ListItemIcon>
                     <AdminPanelSettingsIcon />
                   </ListItemIcon>
                   <ListItemText primary="Admin Panel" />
-                </ListItem>
+                </ListItemButton>
               )}
               
               <Divider />
               
-              <ListItem button onClick={handleLogout}>
+              <ListItemButton onClick={handleLogout}>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>
                 <ListItemText primary="Çıkış Yap" />
-              </ListItem>
+              </ListItemButton>
             </>
           ) : (
             <>
-              <ListItem button onClick={handleApplicationClick}>
+              <ListItemButton onClick={handleApplicationClick}>
                 <ListItemIcon>
                   <AddCircleOutlineIcon />
                 </ListItemIcon>
                 <ListItemText primary="Restoran Başvurusu" />
-              </ListItem>
+              </ListItemButton>
               
-              <ListItem button onClick={handleAdvertiserApplicationClick}>
+              <ListItemButton onClick={handleAdvertiserApplicationClick}>
                 <ListItemIcon>
                   <CampaignIcon />
                 </ListItemIcon>
                 <ListItemText primary="Reklam Veren Başvurusu" />
-              </ListItem>
+              </ListItemButton>
               
               <Divider />
               
-              <ListItem button onClick={handleLoginClick}>
+              <ListItemButton onClick={handleLoginClick}>
                 <ListItemIcon>
                   <PersonIcon />
                 </ListItemIcon>
                 <ListItemText primary="Giriş Yap" />
-              </ListItem>
+              </ListItemButton>
             </>
           )}
         </List>
